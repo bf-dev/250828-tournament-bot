@@ -1,7 +1,3 @@
-# 토너먼트 봇 (Tournament Bot)
-
-리그 오브 레전드 토너먼트 경기와 활동을 관리하는 종합 디스코드 봇입니다.
-
 ## 1. 사전 준비 (Prerequisites)
 
 봇을 실행하기 전에 디스코드 봇 토큰이 필요합니다.
@@ -13,7 +9,7 @@
 3. 생성된 애플리케이션의 `Bot` 탭으로 이동합니다.
 4. `Add Bot` 버튼을 클릭하여 봇을 생성합니다.
 5. `Reset Token` 버튼을 클릭하여 봇의 토큰을 복사합니다. 이 토큰은 매우 중요하므로 안전하게 보관해야 합니다.
-6. **Privileged Gateway Intents** 섹션에서 `SERVER MEMBERS INTENT`와 `MESSAGE CONTENT INTENT`를 활성화(enable)해야 합니다. 이는 봇이 멤버 목록을 보고 메시지 내용을 읽는 데 필요합니다.
+6. **Privileged Gateway Intents** 섹션에서 INTENT 3개를 모두 활성화(enable)해야 합니다. 이는 봇이 멤버 목록을 보고 메시지 내용을 읽는 데 필요합니다.
 
 ---
 
@@ -146,104 +142,3 @@ npm run db:push
 # 봇 실행
 npm start
 ```
-
-## 명령어 개요
-
-### 경기 명령어 (`/경기`)
-- `생성` - 새로운 경기 생성
-- `참가` - 대기 중인 경기에 참가
-- `탈퇴` - 대기 중인 경기에서 탈퇴
-- `목록` - 모든 경기 나열
-- `정보` - 경기 세부 정보 확인
-- `완료` - 경기 완료 (관리자)
-- `삭제` - 경기 삭제 (관리자)
-
-### 스탬프 명령어 (`/스탬프`)
-- `수집` - 참가 스탬프 수집
-- `목록` - 스탬프 확인
-- `순위` - 스탬프 순위
-
-### 메모 명령어 (`/메모`)
-- `추가` - 경기 메모 추가
-- `목록` - 경기 메모 확인
-- `수정` - 자신의 메모 수정
-- `삭제` - 메모 삭제
-
-### 주사위 명령어 (`/주사위`)
-- `굴리기` - 표준 주사위 굴리기
-- `d20` - 크리티컬 메시지가 있는 D20 굴리기
-- `동전` - 동전 던지기
-- `커스텀` - 커스텀 주사위 식
-
-### 경고 명령어 (`/경고`)
-- `목록` - 경고 확인
-- `발급` - 경고 발급 (관리자)
-- `제거` - 경고 제거 (관리자)
-- `전체삭제` - 모든 경고 삭제 (관리자)
-- `통계` - 경고 통계
-
-### 관리 명령어 (`/관리`)
-- `통계` - 봇 통계
-- `사용자정보` - 사용자 정보
-- `정리` - 데이터 정리
-- `백업` - 백업 생성
-- `초기화` - 사용자 데이터 초기화
-
-### 도움말 명령어 (`/도움말`)
-- 일반 도움말 또는 특정 명령어 도움말
-
-## Key Features
-
-### Automatic Warning Reduction
-When users participate in completed matches, their oldest active warning is automatically removed, encouraging participation.
-
-### Participation Tracking
-The stamp system rewards users for participating in matches, creating engagement and tracking activity levels.
-
-### Administrative Control
-Comprehensive admin tools allow server managers to maintain the bot, clean up data, and manage users effectively.
-
-### Data Persistence
-All data is stored in an SQLite database with proper relationships and constraints for data integrity.
-
-## Database Schema
-
-- **Users**: Discord user information and relationships
-- **Matches**: Match details, participants, and status
-- **Stamps**: Participation rewards linked to matches and users
-- **Warnings**: User warnings with active/inactive status
-- **Match Notes**: User-generated notes for matches
-
-## Development
-
-### Database Commands
-```bash
-npm run db:generate   # Generate Prisma client
-npm run db:push      # Push schema to database
-npm run db:reset     # Reset database (WARNING: deletes all data)
-```
-
-### File Structure
-```
-├── commands/         # Slash commands
-├── prisma/          # Database schema
-├── index.js         # Main bot file
-├── package.json     # Dependencies and scripts
-├── .env            # Environment variables
-└── README.md       # This file
-```
-
-## Support
-
-This bot includes:
-- Error handling for all commands
-- Permission checks for admin functions
-- User-friendly error messages
-- Comprehensive help system
-- Data validation and sanitation
-
-문제나 질문이 있으시면 Discord에서 `/도움말` 명령어를 참고하거나 기술적 세부사항은 코드 주석을 확인하세요.
-
-## License
-
-ISC License - See package.json for details.
