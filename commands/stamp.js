@@ -2,15 +2,15 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('스탬프')
-        .setDescription('경기 스탬프 관리')
+        .setName('내전스탬프')
+        .setDescription('내전 스탬프 관리')
         .addSubcommand(subcommand =>
             subcommand
                 .setName('수집')
-                .setDescription('경기 참가 스탬프를 수집합니다')
+                .setDescription('내전 참가 스탬프를 수집합니다')
                 .addIntegerOption(option =>
-                    option.setName('경기아이디')
-                        .setDescription('스탬프를 수집할 경기 ID')
+                    option.setName('내전아이디')
+                        .setDescription('스탬프를 수집할 내전 ID')
                         .setRequired(true)))
         .addSubcommand(subcommand =>
             subcommand
@@ -43,7 +43,7 @@ module.exports = {
 };
 
 async function collectStamp(interaction, prisma) {
-    const matchId = interaction.options.getInteger('경기아이디');
+    const matchId = interaction.options.getInteger('내전아이디');
     const userId = interaction.user.id;
 
     try {
@@ -53,18 +53,18 @@ async function collectStamp(interaction, prisma) {
         });
 
         if (!match) {
-            await interaction.reply({ content: '경기를 찾을 수 없습니다!', ephemeral: true });
+            await interaction.reply({ content: '내전를 찾을 수 없습니다!', ephemeral: true });
             return;
         }
 
         if (match.status !== 'completed') {
-            await interaction.reply({ content: '완료된 경기에서만 스탬프를 수집할 수 있습니다!', ephemeral: true });
+            await interaction.reply({ content: '완료된 내전에서만 스탬프를 수집할 수 있습니다!', ephemeral: true });
             return;
         }
 
         const isParticipant = match.participants.some(p => p.id === userId);
         if (!isParticipant) {
-            await interaction.reply({ content: '이 경기에 참가하지 않았습니다!', ephemeral: true });
+            await interaction.reply({ content: '이 내전에 참가하지 않았습니다!', ephemeral: true });
             return;
         }
 
@@ -78,7 +78,7 @@ async function collectStamp(interaction, prisma) {
         });
 
         if (existingStamp) {
-            await interaction.reply({ content: '이미 이 경기에서 스탬프를 수집하셨습니다!', ephemeral: true });
+            await interaction.reply({ content: '이미 이 내전에서 스탬프를 수집하셨습니다!', ephemeral: true });
             return;
         }
 
@@ -101,7 +101,7 @@ async function collectStamp(interaction, prisma) {
             .setColor(0x00FF00)
             .setTitle('스탬프 수집 완료! ⭐')
             .addFields(
-                { name: '경기', value: match.name, inline: true },
+                { name: '내전', value: match.name, inline: true },
                 { name: '총 스탬프', value: totalStamps.toString(), inline: true }
             )
             .setTimestamp();
@@ -125,9 +125,17 @@ async function listStamps(interaction, prisma) {
 
     const totalStamps = stamps.length;
 
+    let displayName;
+    try {
+        const member = await interaction.guild.members.fetch(targetUser.id);
+        displayName = member.displayName;
+    } catch (error) {
+        displayName = targetUser.displayName || targetUser.username;
+    }
+
     const embed = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setTitle(`${targetUser.displayName || targetUser.username}님의 스탬프`)
+        .setTitle(`${displayName}님의 스탬프`)
         .addFields(
             { name: '총 스탬프', value: totalStamps.toString(), inline: true }
         )
@@ -177,7 +185,15 @@ async function stampLeaderboard(interaction, prisma) {
 
     const leaderboardPromises = stampCounts.map(async (entry, index) => {
         try {
-            const user = await interaction.client.users.fetch(entry.userId);
+            let displayName;
+            try {
+                const member = await interaction.guild.members.fetch(entry.userId);
+                displayName = member.displayName;
+            } catch (error) {
+                const user = await interaction.client.users.fetch(entry.userId);
+                displayName = user.displayName || user.username;
+            }
+            
             const position = index + 1;
             let medal = '';
             
@@ -186,7 +202,7 @@ async function stampLeaderboard(interaction, prisma) {
             else if (position === 3) medal = '🥉';
             else medal = `${position}.`;
 
-            return `${medal} **${user.displayName || user.username}** - ${entry._count.id}개 스탬프`;
+            return `${medal} **${displayName}** - ${entry._count.id}개 스탬프`;
         } catch (error) {
             return `${index + 1}. 알 수 없는 사용자 - ${entry._count.id}개 스탬프`;
         }
